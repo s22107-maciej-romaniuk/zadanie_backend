@@ -12,14 +12,16 @@ window.onload = function () {
 
 function onSubmit(e) {
   e.preventDefault();
-  const emailText = formularz.elements.email.value;
-  const wiek = formularz.elements.wiek.value;
-  const plec = document.querySelector('input[name="plec"]:checked').value;
+  const dataUrodzenia = formularz.elements.dataUrodzenia.value;
+  const liczbaDoDodania = formularz.elements.liczbaDoDodania.value;
+  const jednostka = document.querySelector(
+    'input[name="jednostka"]:checked'
+  ).value;
 
   let requestBody = {
-    emailText,
-    wiek,
-    plec,
+    dataUrodzenia,
+    liczbaDoDodania,
+    jednostka,
   };
 
   const Http = new XMLHttpRequest();
@@ -28,26 +30,28 @@ function onSubmit(e) {
   Http.setRequestHeader("Content-type", "application/json; charset=UTF-8");
   Http.send(JSON.stringify(requestBody));
   Http.onload = () => {
-    analyzeServerResponse(JSON.parse(Http.responseText), Http.status);
-
     if (Http.status == 200) {
-      rezultat.innerHTML = "Sukces";
+      rezultat.innerHTML = JSON.parse(Http.responseText).przyszlaData;
     } else if (Http.status == 400) {
-      rezultat.innerHTML = "Błąd";
+      analyzeBadResponse(JSON.parse(Http.responseText));
+      rezultat.innerHTML = "Niepoprawne dane";
     }
   };
 }
 
-function analyzeServerResponse({ poprawnyEmail, poprawnyWiek }) {
+function analyzeBadResponse({
+  poprawnaDataUrodzenia,
+  poprawnaLiczbaDoDodania,
+  poprawnaJednostka,
+}) {
   informacja.innerHTML = "";
-  if (poprawnyEmail) {
-    informacja.innerHTML += "Email poprawny<br>";
-  } else {
-    informacja.innerHTML += "Błędny email<br>";
+  if (!poprawnaDataUrodzenia) {
+    informacja.innerHTML += "Błędna data<br>";
   }
-  if (poprawnyWiek) {
-    informacja.innerHTML += "Wiek zaakceptowany<br>";
-  } else {
-    informacja.innerHTML += "Minimalny wiek to 20 lat<br>";
+  if (!poprawnaLiczbaDoDodania) {
+    informacja.innerHTML += "Liczba do dodania musi być dodatnia<br>";
+  }
+  if (!poprawnaJednostka) {
+    informacja.innerHTML += "Niezrozumiała jednostka<br>";
   }
 }

@@ -2,30 +2,50 @@ const express = require("express");
 
 const app = express();
 
-const regexEmail = new RegExp(
-  "^[a-zA-Z0-9]+(?:.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:.[a-zA-Z0-9]+)*$"
-);
-
-app.use(express.static("zad3"));
+app.use(express.static("zad4"));
 app.use(express.json());
 
-app.post("/formularz", (req, res) => {
+//middleware
+app.use("/formularz", (req, res, next) => {
   console.log("Got body:", req.body);
+  next();
+});
 
-  const emailText = req.body.emailText;
-  const wiek = req.body.wiek;
-  var poprawnyEmail = regexEmail.test(emailText);
-  var poprawnyWiek = wiek >= 20;
+app.post("/formularz", (req, res) => {
+  const { dataUrodzenia, liczbaDoDodania, jednostka } = req.body;
+  let liczbaDoDodaniaParsed = Number(liczbaDoDodania);
+  let dataUrodzeniaParsed = new Date(dataUrodzenia);
 
-  responseBody = {
-    poprawnyEmail,
-    poprawnyWiek,
-  };
+  //walidacja
+  let poprawnaDataUrodzenia = !isNaN(Date.parse(dataUrodzenia));
+  let poprawnaLiczbaDoDodania = liczbaDoDodaniaParsed >= 1;
+  let poprawnaJednostka = jednostka === "Dni" || jednostka === "Miesiące";
 
-  if (poprawnyEmail && poprawnyWiek) {
+  //operacje
+  if (poprawnaDataUrodzenia && poprawnaLiczbaDoDodania && poprawnaJednostka) {
+    if (jednostka === "Dni") {
+      dataUrodzeniaParsed.setDate(
+        dataUrodzeniaParsed.getDate() + liczbaDoDodaniaParsed
+      );
+    } else {
+      dataUrodzeniaParsed.setMonth(
+        dataUrodzeniaParsed.getMonth() + liczbaDoDodaniaParsed
+      );
+    }
+
+    let responseBody = {
+      przyszlaData: dataUrodzeniaParsed.toISOString().split("T")[0],
+    };
+
     res.status(200);
     res.send(responseBody);
   } else {
+    let responseBody = {
+      poprawnaDataUrodzenia,
+      poprawnaLiczbaDoDodania,
+      poprawnaJednostka,
+    };
+
     res.status(400);
     res.send(responseBody);
   }

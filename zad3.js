@@ -14,6 +14,8 @@ app.post("/formularz", (req, res) => {
 
   const emailText = req.body.emailText;
   const wiek = req.body.wiek;
+
+  //walidacja
   var poprawnyEmail = regexEmail.test(emailText);
   var poprawnyWiek = wiek >= 20;
 
