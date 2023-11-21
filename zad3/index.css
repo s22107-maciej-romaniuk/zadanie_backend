@@ -1,0 +1,14 @@
+.formularz1 {
+  background-color: grey;
+  border: 5px solid black;
+  max-width: 200px;
+  padding: 10px;
+}
+
+.rezultat {
+  background-color: lightBlue;
+  border: 5px solid black;
+  max-width: 200px;
+  padding: 10px;
+  margin-top: 10px;
+}
