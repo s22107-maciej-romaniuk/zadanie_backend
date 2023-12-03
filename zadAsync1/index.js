@@ -26,16 +26,27 @@ function onSubmit(e) {
   };
 
 
-  axios
-    .post("http://localhost:3000/formularz", requestBody)
-    .then(response => {
-        rezultat.innerHTML = response.data.przyszlaData;
-    })
-    .catch(error => {
-      console.error(error)
-      analyzeBadResponse(error.response.data);
+  let disableClientValidation = true;
+
+  if(disableClientValidation){
+    sendAsynchronous(requestBody, rezultat);
+  }
+  else{
+    let poprawnaDataUrodzenia = !isNaN(Date.parse(dataUrodzenia));
+    let poprawnaLiczbaDoDodania = liczbaDoDodania >= 1;
+    let poprawnaJednostka = jednostka === "Dni" || jednostka === "Miesiące";
+    if(poprawnaDataUrodzenia && poprawnaLiczbaDoDodania && poprawnaJednostka){
+      sendAsynchronous(requestBody, rezultat);
+    }
+    else{
+      analyzeBadResponse({
+        poprawnaDataUrodzenia,
+        poprawnaLiczbaDoDodania,
+        poprawnaJednostka,
+      });
       rezultat.innerHTML = "Niepoprawne dane";
-    })
+    }
+  }
 }
 
 function analyzeBadResponse({
@@ -53,4 +64,17 @@ function analyzeBadResponse({
   if (!poprawnaJednostka) {
     informacja.innerHTML += "Niezrozumiała jednostka<br>";
   }
+}
+
+function sendAsynchronous(requestBody, rezultat){
+  axios
+    .post("http://localhost:3000/formularz", requestBody)
+    .then(response => {
+        rezultat.innerHTML = response.data.przyszlaData;
+    })
+    .catch(error => {
+        console.error(error)
+        analyzeBadResponse(error.response.data);
+        rezultat.innerHTML = "Niepoprawne dane";
+    })
 }
