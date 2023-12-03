@@ -26,7 +26,7 @@ function onSubmit(e) {
   };
 
 
-  let disableClientValidation = true;
+  let disableClientValidation = false;
 
   if(disableClientValidation){
     sendAsynchronous(requestBody, rezultat);
