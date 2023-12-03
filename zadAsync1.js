@@ -5,13 +5,20 @@ const app = express();
 app.use(express.static("zadAsync1"));
 app.use(express.json());
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 //middleware
 app.use("/formularz", (req, res, next) => {
   console.log("Got body:", req.body);
   next();
 });
 
-app.post("/formularz", (req, res) => {
+app.post("/formularz", async (req, res) => {
+  await sleep(5000);
   const { dataUrodzenia, liczbaDoDodania, jednostka } = req.body;
   let liczbaDoDodaniaParsed = Number(liczbaDoDodania);
   let dataUrodzeniaParsed = new Date(dataUrodzenia);
